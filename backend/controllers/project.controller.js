@@ -100,12 +100,12 @@ export const getProjectById = async(req,res)=>{
     const {projectId} = req.params;
 
     try{
-        const project = await projectService.getProjectById({
+        const getProject = await project.getProjectById({
             projectId
         });
         return res.status(200).json({
             message: "Project fetched successfully",
-            project
+            project: getProject   
         })
     }
     catch(err){

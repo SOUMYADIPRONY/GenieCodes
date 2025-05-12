@@ -1,13 +1,15 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect, use} from "react";
 import { UserContext } from "../context/user.context";
 import axiosInstance from "../config/axios";
-
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const Home = () => {    
 
    const {user}=useContext(UserContext);  
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [projectName, setProjectName] = useState(null);
-
+   const [project, setProject] = useState([]);
+   const navigate = useNavigate();
    function createProject(e){
 
       e.preventDefault()
@@ -23,15 +25,41 @@ const Home = () => {
 
          
    }
+
+   useEffect(() => {
+    axiosInstance.get("/projects/all").then((res) => {
+      console.log(res.data);
+      setProject(res.data.projects);
+    }).catch((err) => {
+      console.log(err.response.data);
+    });
+   }, []);
+
    return(
          <main className='p-4'>
 
-            <div className="projects">
+            <div className="projects flex flex-wrap gap-3">
                <button onClick={()=> setIsModalOpen(true)} className="project p-4 border-2 rounded-md border-gray-300 hover:border-gray-500 hover:bg-gray-100 "> 
                 New Project
                <i className="ri-folder-add-line m-2"></i>
 
                </button>
+
+                  {
+                     project.map((project)=>(
+                        <div key={project._id}  
+                        onClick={()=> navigate(`/project`, {state: {project}})}
+                    
+                        className="project cursor-pointer flex flex-col gap-2 p-4 border-2 rounded-md border-gray-300 hover:border-gray-500 hover:bg-gray-400 ">
+                        <h2 className="text-lg font-semibold">{project.name}</h2>
+                        
+                        <div className="flex gap-2 items-center">
+                           <i className="ri-user-heart-line"></i>
+                           <p><small>Collaborators</small></p>
+                           {project.users.length}</div>
+                        </div>
+                     ))
+                  }
             </div>
 
             {isModalOpen && (
