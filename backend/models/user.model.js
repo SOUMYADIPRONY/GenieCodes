@@ -31,10 +31,19 @@ userSchema.methods.isValidPassword = async function(password){
     return await bcrypt.compare(password, this.password)
 }
 
+// userSchema.methods.generateJWT = function(){
+//     return jwt.sign({email: this.email}, process.env.JWT_SECRET, {expiresIn: '24h'})
+// }
 userSchema.methods.generateJWT = function(){
-    return jwt.sign({email: this.email}, process.env.JWT_SECRET, {expiresIn: '24h'})
+    if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET is not defined in environment variables');
+    }
+    return jwt.sign(
+        { email: this.email }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '24h' }
+    );
 }
-
 const User = mongoose.model('user', userSchema);
 
 export default User;
