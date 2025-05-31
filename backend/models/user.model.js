@@ -44,6 +44,14 @@ userSchema.methods.generateJWT = function(){
         { expiresIn: '24h' }
     );
 }
+userSchema.methods.clearTokens = async function() {
+    if (redisClient) {
+        // Clear any stored refresh tokens
+        await redisClient.del(this.email);
+    }
+};
+
+
 const User = mongoose.model('user', userSchema);
 
 export default User;

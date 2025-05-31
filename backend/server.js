@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import projectModel from './models/project.model.js';
+import { generateResult } from './services/ai.service.js';
+
 dotenv.config()
 
 
@@ -54,9 +56,25 @@ io.on('connection', socket => {
     console.log("Client connected")
     socket.join(socket.roomId);
 
-    socket.on('project-message', data=>{
+    socket.on('project-message', async data=>{
         console.log(data)
+        const message = data.message;
+        const aiIsPresentInMessage = message.includes('@ai');
         socket.broadcast.to(socket.roomId).emit('project-message', data)
+        if(aiIsPresentInMessage){
+                const prompt = message.replace('@ai', '');
+
+                const result = await generateResult(prompt);
+
+                io.to(socket.roomId).emit('project-message',{
+                    message: result,
+                    sender:{
+                        _id: 'ai',
+                        email: 'AI'
+                    }
+                })
+        }
+        
     })
   socket.on('disconnect', () => { 
     console.log("User disconnected");

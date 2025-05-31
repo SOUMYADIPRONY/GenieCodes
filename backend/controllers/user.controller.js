@@ -68,26 +68,50 @@ export const profileController= async(req, res)=>{
     })
 }
 
-export const logoutController = async (req, res) => {  
-    try{
-        const token = req.cookies.token || req.headers.authorization.split(" ")[1];
+// export const logoutController = async (req, res) => {  
+//     try{
+//         const token = req.cookies.token || req.headers.authorization.split(" ")[1];
 
-        redisClient.set(token, "logout", 'EX', 60*60*24);
+//         redisClient.set(token, "logout", 'EX', 60*60*24);
+
+//         res.status(200).json({
+//             message: "logout successful"
+//         })
+//     }
+
+
+//     catch(err){
+//         console.log(err);
+//         res.status(500).json({
+//             error: "Internal server error"
+//         })
+//     }
+
+// }
+
+export const logoutController = async (req, res) => {
+    try {
+        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+        
+        if (token) {
+            // Add token to blacklist in Redis
+            await redisClient.set(token, "logout", 'EX', 60*60*24); // 24 hours
+        }
+
+        // Clear cookies if they exist
+        res.clearCookie('token');
+        res.clearCookie('refreshToken');
 
         res.status(200).json({
-            message: "logout successful"
-        })
-    }
-
-
-    catch(err){
-        console.log(err);
+            message: "Logout successful"
+        });
+    } catch (err) {
+        console.error('Logout error:', err);
         res.status(500).json({
-            error: "Internal server error"
-        })
+            message: "Error during logout"
+        });
     }
-
-}
+};
 
 export const getAllUsersController = async (req, res) => {
 

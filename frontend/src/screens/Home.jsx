@@ -5,7 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const Home = () => {    
 
-   const {user}=useContext(UserContext);  
+   const {user, logout}=useContext(UserContext);  
    const [isModalOpen, setIsModalOpen] = useState(false);
    const [projectName, setProjectName] = useState(null);
    const [project, setProject] = useState([]);
@@ -37,6 +37,24 @@ const Home = () => {
 
    return(
          <main className='p-4'>
+             <header className="flex justify-between items-center w-full p-4 bg-slate-100 border-b">
+                <h1 className="text-2xl font-semibold">My Projects</h1>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-white">
+                        <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white">
+                            {user?.email?.[0]?.toUpperCase()}
+                        </div>
+                        <span className="text-sm">{user?.email}</span>
+                    </div>
+                    <button 
+                        onClick={logout}
+                        className='flex items-center gap-1 p-2 hover:bg-red-100 rounded-lg text-red-600'
+                    >
+                        <i className="ri-logout-box-line"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </header>
 
             <div className="projects flex flex-wrap gap-3">
                <button onClick={()=> setIsModalOpen(true)} className="project p-4 border-2 rounded-md border-gray-300 hover:border-gray-500 hover:bg-gray-100 "> 
